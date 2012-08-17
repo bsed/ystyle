@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <namespace name="/test">
+		<action name="test1" method="test1"
+			class="com.duyunfei.action.TestAction">
+			<result name="success" type="forward">success.jsp</result>
+			<result name="error" type="redirect">error.jsp</result>
+		</action>
+
+		<action name="test2" method="test2"
+			class="com.duyunfei.action.TestAction">
+			<result name="success" type="forward">success.jsp</result>
+			<result name="error" type="forward">error.jsp</result>
+		</action>
+
+		<action name="test3" method="test3"
+			class="com.duyunfei.action.TestAction">
+			<result name="success" type="forward">success.jsp</result>
+			<result name="error" type="forward">error.jsp</result>
+		</action>
+	</namespace>
+	
+	<namespace name="/pojo">
+		<action name="createPojos" method="createPojos"
+			class="org.love.create.CreateAction">
+			<result name="success" type="forward">success.jsp</result>
+			<result name="error" type="redirect">error.jsp</result>
+		</action>
+		
+	</namespace>
+	
+</actions>
