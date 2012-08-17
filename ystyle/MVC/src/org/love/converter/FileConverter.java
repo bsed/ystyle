@@ -50,10 +50,13 @@ public class FileConverter implements TypeConverter {
 						FileItem item = fis[i];
 						long filesize=item.getSize();
 						String filename = item.getName();
+						if(filename.indexOf(File.separator)>=0){
+							filename=filename.substring(filename.lastIndexOf(File.separator)+1);
+						}
 						logger.debug("filesize: "+filesize);
 						File file = new File(realpath + File.separator
 								+ filename);
-						request.getRealPath(path);
+						
 						item.write(file);
                         
 						FilePo[] fps_temp=fps;
@@ -75,7 +78,8 @@ public class FileConverter implements TypeConverter {
 					return null;
                    
 				} else {
-					FileItem item=(FileItem)value;
+					FileItem[] items=(FileItem[])value;
+					FileItem item=items[0];
 					long filesize=item.getSize();
 					if(filesize==0){
 						return null;
@@ -85,12 +89,12 @@ public class FileConverter implements TypeConverter {
 						String exts = filename.substring(filename
 								.lastIndexOf("."));
 						filename=name+exts ;
+					}else{
+						filename=filename.substring(filename.lastIndexOf(File.separator)+1);
 					}
 					File file = new File(realpath + File.separator
 							+ filename);
-					request.getRealPath(path);
 					item.write(file);
-					
 					FilePo fp=new FilePo();
 					fp.setFile(file);
 					fp.setFilename(filename);
@@ -112,4 +116,8 @@ public class FileConverter implements TypeConverter {
 		return null;
 	}
 
+	public static void main(String[] args) {
+		String filename = "E:\\pics\\1.jpg";
+		System.out.println(filename.substring(filename.lastIndexOf(File.separator)+1));
+	}
 }
