@@ -3,6 +3,7 @@ package com.test.action;
 import java.lang.reflect.Array;
 import java.util.logging.Logger;
 
+import org.apache.commons.fileupload.FileItem;
 import org.love.Annotation.Autowired;
 import org.love.action.BaseAction;
 import org.love.utils.Utils;
@@ -37,6 +38,8 @@ public class TestAction extends BaseAction {
 		 * Testafei(); user.setUsername(username); user.setUserpwd(userpwd);
 		 * userService.save(user);
 		 */
+		FileItem[] fis = (FileItem[]) request.getParameterMap().get("testAfei.myimg0");
+		System.out.println(fis.length);
 		Utils.printFields(testAfei);
 		userService.save(testAfei);
 		return "success";
