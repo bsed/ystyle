@@ -2,19 +2,19 @@
 <actions>
     <namespace name="/test">
 		<action name="test1" method="test1"
-			class="com.duyunfei.action.TestAction">
+			class="com.test.action.TestAction">
 			<result name="success" type="forward">success.jsp</result>
 			<result name="error" type="redirect">error.jsp</result>
 		</action>
 
 		<action name="test2" method="test2"
-			class="com.duyunfei.action.TestAction">
+			class="com.test.action.TestAction">
 			<result name="success" type="forward">success.jsp</result>
 			<result name="error" type="forward">error.jsp</result>
 		</action>
 
 		<action name="test3" method="test3"
-			class="com.duyunfei.action.TestAction">
+			class="com.test.action.TestAction">
 			<result name="success" type="forward">success.jsp</result>
 			<result name="error" type="forward">error.jsp</result>
 		</action>
