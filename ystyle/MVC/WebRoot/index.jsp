@@ -19,7 +19,7 @@
 	</head>
 
 	<body>
-		<form action="<%=path%>/test/test1.love" method="post" enctype="multipart/form-data">
+		<form action="<%=path%>/test/test1.action" method="post" enctype="multipart/form-data">
 			姓名:<input type="text" name="testAfei.username" />
 			<br/>
 			密码:<input type="text" name="testAfei.password" />
@@ -39,19 +39,20 @@
 			<input name="testAfei.hobbyTest" type="checkbox" value=".net"/>.net
 			<input name="testAfei.hobbyTest" type="checkbox" value="c/c++"/>c/c++
 			<br/>
-			<input type="text" name="folderPath">
+			<input type="text" name="folderPath" value="testafei">
 			<input type="file" name="testAfei.myimg"/>
 			<input type="file" name="testAfei.myimg"/>  
+			<input type="file" name="testAfei.myimg0"/>
 			<input type="submit" value="提交到成功页面" />
 		</form>
 
-		<form action="<%=path%>/test/test3.love" method="post">
+		<form action="<%=path%>/test/test3.action" method="post">
 			<input type="text" name="uid" value="62"/>
 			<input type="text" name="title" value="title" />
 			<input type="submit" value="提交到添加新闻页面" />
 		</form>
 
-		<form action="<%=path%>/test/test2.love" method="post">
+		<form action="<%=path%>/test/test2.action" method="post">
 			<input type="text" name="uid" value="63" />
 			<input type="submit" value="提交到查询页面" />
 		</form>
