@@ -44,9 +44,7 @@ public class MainServlet extends HttpServlet {
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-	
-		
-		
+	try{
 		// 字符编码
 		/*request.setCharacterEncoding(encoding);
 		response.setCharacterEncoding(encoding);*/
@@ -146,8 +144,6 @@ public class MainServlet extends HttpServlet {
 		Object actionValue = InvocakeHelp.invokeMethod(action, avo.getMethod(),
 				null);
 		
-		//释放上下文资源
-		ActionContext.setContext(null);
 		
 		if(actionValue==null || actionValue.equals("")){
 			return ;
@@ -166,6 +162,13 @@ public class MainServlet extends HttpServlet {
     					request, response);
     		}      
         }
+	}finally{
+		//释放上下文资源
+		ActionContext.setContext(null);
+	}
+		
+		
+		
 		
 	}
 

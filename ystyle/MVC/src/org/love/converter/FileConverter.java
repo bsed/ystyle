@@ -1,7 +1,6 @@
 package org.love.converter;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.love.Annotation.UploadFile;
 import org.love.po.FilePo;
-import org.love.servlet.MainServlet;
 import org.love.utils.ActionContext;
 import org.love.utils.ActionReplaceHolder;
 import org.love.utils.Utils;
@@ -28,7 +26,7 @@ public class FileConverter implements TypeConverter {
 		UploadFile uf = field.getAnnotation(UploadFile.class);
 		HttpServletRequest request = ActionContext.getRequest();
 		try {
-
+			
 			if (uf != null) {
 				String path = uf.path();
 				logger.debug("path: " + path);
