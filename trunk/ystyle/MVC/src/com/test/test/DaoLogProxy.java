@@ -1,6 +1,8 @@
 package com.test.test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.love.ProxyFactory.DefaultProxyFactory;
@@ -26,13 +28,19 @@ public class DaoLogProxy extends DefaultProxyFactory {
         	for(Object arg:args){
         		showargs=showargs+arg+"  ";
         	}
-        	log.info("执行"+this.getTargetObject()+"的"+method.getName()+"方法，参数为"+showargs);
+        	log.info("执行"+this.getTargetObject().getClass()+"的"+method.getName()+"方法，参数为"+showargs);
         	returnValue=method.invoke(this.getTargetObject(), args);        	
         }else{
         	returnValue=method.invoke(this.getTargetObject(), args);
         }
 		
 		return returnValue;
+	}
+	public static void main(String[] args) {
+		List<String> list=(List<String>)new DaoLogProxy().factory(new ArrayList<String>(),"includeMethods:add,get");
+		list.add("test0");
+		list.get(0);
+		list.remove(0);
 	}
 
 }

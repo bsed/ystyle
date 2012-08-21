@@ -22,7 +22,7 @@ public abstract class DefaultProxyFactory implements ProxyFactory {
 		this.params=params;
 		
 		Class cls = targetObject.getClass();
-		List<Class> listInterfaces=new ArrayList<Class>();
+		Set<Class> listInterfaces=new HashSet<Class>();
 		Class[] selfInterfaces=cls.getInterfaces();
 		for(Class inter:selfInterfaces){
 			listInterfaces.add(inter);
