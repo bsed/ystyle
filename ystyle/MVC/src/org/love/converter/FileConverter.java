@@ -2,6 +2,8 @@ package org.love.converter;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -46,7 +48,10 @@ public class FileConverter implements TypeConverter {
 					FileItem[] fis = (FileItem[]) value;
 					for (int i = 0; i < fis.length; i++) {
 						FileItem item = fis[i];
-						long filesize=item.getSize();
+						long filesize=(item==null?0:item.getSize());
+						if(filesize==0){
+							continue;
+						}
 						String filename = item.getName();
 						if(filename.indexOf(File.separator)>=0){
 							filename=filename.substring(filename.lastIndexOf(File.separator)+1);
@@ -78,7 +83,7 @@ public class FileConverter implements TypeConverter {
 				} else {
 					FileItem[] items=(FileItem[])value;
 					FileItem item=items[0];
-					long filesize=item.getSize();
+					long filesize=(item==null?0:item.getSize());
 					if(filesize==0){
 						return null;
 					}

@@ -19,8 +19,11 @@ public class Userinfo implements java.io.Serializable {
     @UploadFile(path="uploadfiles/${param.folderPath}/")
     private FilePo[] myimg;
     
-    @UploadFile(path="uploadfiles/${param.folderPath}/")
+    @UploadFile(path="uploadfiles/${sessionScope.folderPath}/")
     private FilePo myimg0;
+    
+    @UploadFile(path="uploadfiles/xxx/")
+    private FilePo myimg1;
     
     private String[] hobby;
     private String hobbyTest;
@@ -114,6 +117,14 @@ public class Userinfo implements java.io.Serializable {
 
 	public void setMyimg0(FilePo myimg0) {
 		this.myimg0 = myimg0;
+	}
+
+	public FilePo getMyimg1() {
+		return myimg1;
+	}
+
+	public void setMyimg1(FilePo myimg1) {
+		this.myimg1 = myimg1;
 	}
 
 

@@ -6,7 +6,7 @@ public class IntegerConverter implements TypeConverter {
 
 	public Object convertValue(Object value,Field field) {
 		
-		if(value==null || value.equals("")){
+		if(value==null || value.toString().trim().equals("")){
 			return null;
 		}
 		

@@ -38,8 +38,8 @@ public class TestAction extends BaseAction {
 		 * Testafei(); user.setUsername(username); user.setUserpwd(userpwd);
 		 * userService.save(user);
 		 */
-		FileItem[] fis = (FileItem[]) request.getParameterMap().get("testAfei.myimg0");
-		System.out.println(fis.length);
+		FileItem[] fis = (FileItem[]) request.getParameterMap().get("testAfei.myimg");
+		System.out.println((fis!=null?fis.length:null));
 		Utils.printFields(testAfei);
 		userService.save(testAfei);
 		return "success";
