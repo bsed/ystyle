@@ -21,12 +21,13 @@ public class MulRequestWraper extends HttpServletRequestWrapper {
 		super(request);
 
 		try {
+			String  encoding=(request.getCharacterEncoding()==null?"UTF-8":request.getCharacterEncoding());
 			FileItemFactory factory = new DiskFileItemFactory();
 			ServletFileUpload upload = new ServletFileUpload(factory);
 			List<FileItem> items = upload.parseRequest(request);
+			
 			Iterator<FileItem> iter = items.iterator();
-            String  encoding=(request.getCharacterEncoding()==null?"UTF-8":request.getCharacterEncoding());
-			while (iter.hasNext()) {
+            while (iter.hasNext()) {
 				FileItem item = (FileItem) iter.next();
 
 				String fieldName = item.getFieldName();

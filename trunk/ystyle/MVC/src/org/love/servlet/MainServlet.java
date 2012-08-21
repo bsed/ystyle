@@ -46,8 +46,8 @@ public class MainServlet extends HttpServlet {
 		
 	try{
 		// 字符编码
-		/*request.setCharacterEncoding(encoding);
-		response.setCharacterEncoding(encoding);*/
+		request.setCharacterEncoding(encoding);
+		response.setCharacterEncoding(encoding);
 		
 		logger.debug("-------主控制servlet---------");
 		String requestURI = request.getRequestURI();
