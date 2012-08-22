@@ -1,17 +1,20 @@
 package com.test.service;
 
 import org.love.Annotation.Autowired;
+import org.love.Annotation.Proxy;
 import org.love.Annotation.Service;
 import org.love.Annotation.SingleTon;
 import org.love.Annotation.Transactional;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 import com.test.dao.UserDAO;
 import com.test.dao.UserDAOImpl;
+import com.test.test.DaoLogProxy;
 import com.test.vo.Userinfo;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 @SingleTon
 @Service
+@Proxy(proxyFactoryClass=DaoLogProxy.class,params="includeMethods:save,update")
 public class UserServiceImpl implements UserService {
 
 	@Autowired(iocClass = UserDAOImpl.class)
