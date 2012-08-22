@@ -2,11 +2,14 @@ package com.test.dao;
 
 import java.util.List;
 
+import org.love.Annotation.Proxy;
 import org.love.db.Session;
 import org.love.db.SessionFactory;
 
+import com.test.test.TestProxy;
 import com.test.vo.Userinfo;
-//@Proxy(proxyFactoryClass=DaoLogProxy.class,params="includeMethods:save,update")
+
+@Proxy(proxyFactoryClass=TestProxy.class)
 public class UserDAOImpl implements UserDAO {
 
 	public void save(Userinfo user) {

@@ -33,7 +33,6 @@ public class BeanContainer {
 	public static BeanContainer instince() {
 		return bc;
 	}
-
 	/* 缓存单例类 */
 	private static Map<String, Object> autoObjMap = new ConcurrentHashMap<String, Object>();
 
@@ -120,7 +119,8 @@ public class BeanContainer {
 					iocObj = ioc.newInstance();
 					System.out.println("处理" + ioc.getName());
 					AutowiredSet(iocObj);
-					Object setObject = null;
+					// 没有标记注解，则为普通注入
+					Object setObject = iocObj;
 					Service service = iocObj.getClass().getAnnotation(
 							Service.class);
 					Proxy proxy = iocObj.getClass().getAnnotation(Proxy.class);
@@ -129,16 +129,14 @@ public class BeanContainer {
 						Object proxyFactoryClass = service.proxyFactoryClass()
 								.newInstance();
 						setObject = setProxyObject(proxyFactoryClass, iocObj,null);
-					} else if (proxy != null) {
+					} 
+					if (proxy != null) {
 						// 对非service的类进行代理扩展
 						Object proxyFactoryClass = proxy.proxyFactoryClass()
 								.newInstance();
 						String params=proxy.params();
-						setObject = setProxyObject(proxyFactoryClass, iocObj,params);
-					} else {
-						// 没有标记注解，则为普通注入
-						setObject = iocObj;
-					}
+						setObject = setProxyObject(proxyFactoryClass, setObject,params);
+					} 
 					if (checkSingle(iocObj)) {
 						autoObjMap.put(iocObj.getClass().getName(),
 								setObject);
