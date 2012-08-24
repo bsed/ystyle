@@ -12,8 +12,6 @@ import javax.sql.DataSource;
 import org.love.ProxyFactory.ConnProxyFactory;
 import org.love.dbutil.DbUtils;
 
-import com.mysql.jdbc.ConnectionPropertiesImpl;
-
 public class SimpleDataSource implements DataSource {
  
 	private  String driverClassName = "com.mysql.jdbc.Driver";
