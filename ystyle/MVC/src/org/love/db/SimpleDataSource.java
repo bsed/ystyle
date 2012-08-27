@@ -6,21 +6,26 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
+import javax.sql.PooledConnection;
 
 import org.love.ProxyFactory.ConnProxyFactory;
 import org.love.dbutil.DbUtils;
 
 public class SimpleDataSource implements DataSource {
- 
-	private  String driverClassName = "com.mysql.jdbc.Driver";
-	private  String username = "root";
-	private  String password = "root";
-	private  String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8";
 
-	private  int minsize = 10;
+	private String driverClassName = "com.mysql.jdbc.Driver";
+	private String username = "root";
+	private String password = "root";
+	private String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8";
+	private int minsize = 10;
 
+	// 连接代理工厂
+	private ConnProxyFactory cpf = new ConnProxyFactory(this);
+
+	protected final ReentrantLock lock = new ReentrantLock(true);
 
 	public int getMinsize() {
 		return minsize;
@@ -32,14 +37,20 @@ public class SimpleDataSource implements DataSource {
 
 	// 连接池
 	private List<Connection> connPool = new ArrayList<Connection>();
-	
+
 	// 释放连接
-	public  void closeConnection(Connection conn)
-			throws SQLException {
+	public void closeConnection(Connection conn) throws SQLException {
 		// 假如释放的是一个关闭的连接，则在连接池中删除这个连接
 		if (conn.isClosed()) {
-			connPool.remove(conn);
+			lock.lock();
+			try {
+				connPool.remove(conn);
+			} finally {
+				lock.unlock();
+			}
+
 		} else {
+			System.out.println("释放到连接池");
 			putPool(conn);
 		}
 	}
@@ -49,17 +60,29 @@ public class SimpleDataSource implements DataSource {
 	 * 
 	 * @return
 	 */
-	private  Connection searchConntion() {
-		Connection conn = connPool.get(0);
-		connPool.remove(conn);
-		return conn;
+	private Connection searchConntion() {
+		lock.lock();
+		try {
+			Connection conn = connPool.get(0);
+			connPool.remove(conn);
+			return conn;
+		} finally {
+			lock.unlock();
+		}
+
 	}
 
 	/**
 	 * 放入连接池
 	 */
-	private  void putPool(Connection conn) {
+	private void putPool(Connection conn) {
+		lock.lock();
+		try {
 			connPool.add(conn);
+		} finally {
+			lock.unlock();
+		}
+
 	}
 
 	/**
@@ -70,15 +93,12 @@ public class SimpleDataSource implements DataSource {
 	 */
 	private Connection createConnection() throws SQLException {
 		DbUtils.loadDriver(driverClassName);
-		//Connection conn0 = DriverManager.getConnection(url, username, password);
-		Connection conn=(Connection)new ConnProxyFactory(this).factory(DriverManager.getConnection(url, username, password),null);		
+		Connection conn = (Connection) cpf.factory(DriverManager.getConnection(
+				url, username, password), null);
 		return conn;
-		
+
 	}
-	
-	
-	
-	
+
 	public Connection getConnection() throws SQLException {
 		int poolSize = connPool.size();
 		System.out.println("连接池还有" + connPool.size() + "个连接");
@@ -158,6 +178,5 @@ public class SimpleDataSource implements DataSource {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-
 
 }

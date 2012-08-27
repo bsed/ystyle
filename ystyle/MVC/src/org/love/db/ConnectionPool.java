@@ -110,7 +110,7 @@ public class ConnectionPool {
 
 	// 单例 end
 
-	public synchronized Connection getConnection() {
+	public Connection getConnection() {
 		Connection conn=null;
 		try {
 			conn = dataSource.getConnection();
