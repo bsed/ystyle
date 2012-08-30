@@ -265,7 +265,7 @@ public class MainServlet extends HttpServlet {
 			control_config = sc.getServletContext().getRealPath("WEB-INF")
 					+File.separator+ control_config;
 		}
-		ConnectionPool.instance();
+		
 		try {
 			controlXml.readXml(control_config);
 		} catch (Exception e) {
