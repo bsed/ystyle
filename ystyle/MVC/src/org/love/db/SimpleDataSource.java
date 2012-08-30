@@ -16,11 +16,28 @@ import org.love.dbutil.DbUtils;
 
 public class SimpleDataSource implements DataSource {
 
+	//当前正在使用的连接数
+	private transient int currentCount = 0;
+
+	/**
+	 * 当前可用连接数 初始化为@see minsize
+	 */
+	private transient int aviliableCount = 0;
+	
+	//同时连接最大并发数量
+	private int maxactive=8;
+	
+	//最小可用连接数 小于此数量必须补起来
+	private int minsize = 10;
+	
+	//最大可用连接数
+	private int maxsize=30;
+	
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	private String username = "root";
 	private String password = "root";
 	private String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8";
-	private int minsize = 10;
+	
 
 	// 连接代理工厂
 	private ConnProxyFactory cpf = new ConnProxyFactory(this);
@@ -89,7 +106,7 @@ public class SimpleDataSource implements DataSource {
 	 * 创建新的连接
 	 * 
 	 * @return
-	 * @throws SQLException
+	 * @throws SQLException	
 	 */
 	private Connection createConnection() throws SQLException {
 		DbUtils.loadDriver(driverClassName);
