@@ -14,6 +14,8 @@ import javax.sql.DataSource;
 import org.love.ProxyFactory.ConnProxyFactory;
 import org.love.dbutil.DbUtils;
 
+import com.test.vo.Userinfo;
+
 public class SimpleDataSource implements DataSource {
 
 	// 当前正在使用的连接数
@@ -27,8 +29,8 @@ public class SimpleDataSource implements DataSource {
 	// 同时连接最大并发数量
 	private int maxactive = 8;
 
-	// 初始化连接数
-	private int initsize = 10;
+	// 最小可用连接数(也是初始化连接数)
+	private int minsize = 5;
 
 	// 最大可用连接数
 	private int maxsize = 30;
@@ -54,7 +56,7 @@ public class SimpleDataSource implements DataSource {
 
 	public void init() {
 		DbUtils.loadDriver(driverClassName);
-		for (int i = 0; i < initsize; i++) {
+		for (int i = 0; i < minsize; i++) {
 			connPool.add(createConnection());
 		}
 	}
@@ -72,7 +74,9 @@ public class SimpleDataSource implements DataSource {
 
 		} else {
 			System.out.println("释放到连接池");
-			putPool(conn);
+			if (connPool.size() < maxsize) {
+				putPool(conn);
+			}
 		}
 	}
 
@@ -116,27 +120,27 @@ public class SimpleDataSource implements DataSource {
 		Connection conn = null;
 		try {
 			lock.lock();
-			try{
-				conn = (Connection) cpf.factory(DriverManager.getConnection(url,
-						username, password), null);	
-			}finally{
+			try {
+				conn = (Connection) cpf.factory(DriverManager.getConnection(
+						url, username, password), null);
+			} finally {
 				lock.unlock();
 			}
-			
+
 		} catch (SQLException e) {
 			errcount.incrementAndGet();
-            System.out.println("连接错误次数: "+errcount); 
-            if(errcount.get()>=5){
+			System.out.println("连接错误次数: " + errcount);
+			if (errcount.get() >= 5) {
 				throw new RuntimeException(" cannot connect the database!");
 			}
 			try {
 				Thread.sleep(5000);
 				conn = createConnection();
-				if(conn!=null){
-					errcount=new AtomicInteger(0);
+				if (conn != null) {
+					errcount = new AtomicInteger(0);
 					return conn;
 				}
-				
+
 			} catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
@@ -157,7 +161,7 @@ public class SimpleDataSource implements DataSource {
 
 		System.out.println("连接池还有" + poolSize + "个连接");
 
-		if (poolSize < maxsize || poolSize == 0) {
+		if (poolSize < maxsize) {
 			Connection conn = createConnection();
 			putPool(conn);
 		}

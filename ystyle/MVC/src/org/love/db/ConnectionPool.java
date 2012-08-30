@@ -20,7 +20,7 @@ public class ConnectionPool {
 
 	private DataSource dataSource;
 
-	private static String DB_PROPERTIES = "/db.properties";
+	private static String DB_PROPERTIES = "db.properties";
 	
 	private static Properties prop = new Properties();
 
@@ -28,6 +28,7 @@ public class ConnectionPool {
 	private static ConnectionPool cp = new ConnectionPool();
 
 	private ConnectionPool() {
+
 		try {
 			prop.load(Thread.currentThread().getContextClassLoader()
 					.getResourceAsStream(DB_PROPERTIES));
@@ -100,6 +101,7 @@ public class ConnectionPool {
 			//dds.setUrl(jdbcUrl)
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new RuntimeException("数据库加载失败"+e);
 		}
 	}
