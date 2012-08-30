@@ -46,7 +46,7 @@ public class ConnectionPool {
 				simple_dataSource.setUsername(username);
 				simple_dataSource.setPassword(password);
 				simple_dataSource.setUrl(url);
-				simple_dataSource.setMinsize(Integer.parseInt(simple_minsize));
+				//simple_dataSource.setMinsize(Integer.parseInt(simple_minsize));
 				dataSource=simple_dataSource;	
 			}
 			
