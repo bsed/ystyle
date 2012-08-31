@@ -1,5 +1,7 @@
 package com.test.test;
 
+import java.math.BigInteger;
+import java.util.Random;
 
 public class TestMain {
 
@@ -18,11 +20,16 @@ public class TestMain {
 		// AnnotationHelp.AutowiredSet(tm,testCls);
 		//		
 		// tm.test1();
-
-
+		for (int i = 0; i < 10; i++) {
+			System.out.println(generateGUID().length());
+		}
 
 	}
 
+	private static final Random RANDOM = new Random();
 
+	public static String generateGUID() {
+		return new BigInteger(165, RANDOM).toString(36).toUpperCase();
+	}
 
 }

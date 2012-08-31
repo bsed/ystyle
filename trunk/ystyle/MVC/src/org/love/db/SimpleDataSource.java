@@ -14,29 +14,17 @@ import javax.sql.DataSource;
 import org.love.ProxyFactory.ConnProxyFactory;
 import org.love.dbutil.DbUtils;
 
-import com.test.vo.Userinfo;
-
 public class SimpleDataSource implements DataSource {
 
-	// 当前正在使用的连接数
-	private transient int currentCount = 0;
+	// 最小可用连接数
+	private int minIdle = 5;
 
-	/**
-	 * 当前可用连接数 初始化为@see
-	 */
-	private transient int aviliableCount = 0;
+	// 初始化连接数
+	private int initSize = 8;
 
 	// 同时连接最大并发数量
-	private int maxactive = 8;
+	private int maxActive = 8;
 
-	// 最小可用连接数(也是初始化连接数)
-	private int minsize = 5;
-
-	// 最大可用连接数
-	private int maxsize = 30;
-
-	// 连接不成功次数
-	private transient AtomicInteger errcount = new AtomicInteger(0);
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	private String username = "root";
 	private String password = "root";
@@ -50,13 +38,19 @@ public class SimpleDataSource implements DataSource {
 	// 连接池
 	private List<Connection> connPool = new ArrayList<Connection>();
 
+	// 连接不成功次数
+	private AtomicInteger errcount = new AtomicInteger(0);
+
+	// 应用中的连接并发数量
+	private int activeCount = 0;
+
 	public SimpleDataSource() {
 		init();
 	}
 
 	public void init() {
 		DbUtils.loadDriver(driverClassName);
-		for (int i = 0; i < minsize; i++) {
+		for (int i = 0; i < initSize; i++) {
 			connPool.add(createConnection());
 		}
 	}
@@ -64,22 +58,13 @@ public class SimpleDataSource implements DataSource {
 	// 释放连接
 	public void closeConnection(Connection conn) throws SQLException {
 		// 假如释放的是一个关闭的连接，则在连接池中删除这个连接
-		if (conn.isClosed()) {
-			lock.lock();
-			try {
-				connPool.remove(conn);
-			} finally {
-				lock.unlock();
-			}
-
-		} else {
-			System.out.println("释放到连接池");
-			if (connPool.size() < maxsize) {
-				putPool(conn);
-			}
-		}
+        if(!conn.isClosed()){
+        	putPool(conn);
+        	System.out.println(Thread.currentThread().getName()+"关闭");
+        }
+		decreaseActive();
 	}
-
+    
 	/**
 	 * 此方法必须保证还有可用连接
 	 * 
@@ -89,25 +74,18 @@ public class SimpleDataSource implements DataSource {
 		lock.lock();
 		try {
 			Connection conn = connPool.get(0);
-			connPool.remove(conn);
+			connPool.remove(0);
 			return conn;
 		} finally {
 			lock.unlock();
 		}
-
 	}
 
 	/**
 	 * 放入连接池
 	 */
 	private void putPool(Connection conn) {
-		lock.lock();
-		try {
-			connPool.add(conn);
-		} finally {
-			lock.unlock();
-		}
-
+		connPool.add(conn);	
 	}
 
 	/**
@@ -137,7 +115,7 @@ public class SimpleDataSource implements DataSource {
 				Thread.sleep(5000);
 				conn = createConnection();
 				if (conn != null) {
-					errcount = new AtomicInteger(0);
+					errcount.set(0);
 					return conn;
 				}
 
@@ -151,22 +129,45 @@ public class SimpleDataSource implements DataSource {
 	}
 
 	public Connection getConnection() throws SQLException {
-		int poolSize = 0;
+		increaseActive();
+		int poolSize=0;
+		lock.lock();
+		try{
+			poolSize=connPool.size();
+		}finally{
+			lock.unlock();	
+		}
+		System.out.println(Thread.currentThread().getName()+"打开，连接池可用数: " + poolSize +" 并发数: "+ activeCount);
+		long starttime=System.currentTimeMillis();
+		Connection conn = null;
+		if (poolSize <= minIdle) {
+			System.out.println("生成连接==========================");	
+			conn = createConnection();
+		} else { 
+			conn = searchConntion();
+		}  
+		long endtime=System.currentTimeMillis();
+		//System.out.println("获取链接耗时: "+(endtime-starttime));
+		return conn;
+
+	}
+
+	private void increaseActive(){
 		lock.lock();
 		try {
-			poolSize = connPool.size();
+			activeCount++;
 		} finally {
 			lock.unlock();
 		}
-
-		System.out.println("连接池还有" + poolSize + "个连接");
-
-		if (poolSize < maxsize) {
-			Connection conn = createConnection();
-			putPool(conn);
+	}
+	
+	private void decreaseActive(){
+		lock.lock();
+		try {
+			activeCount--;
+		} finally {
+			lock.unlock();
 		}
-		return searchConntion();
-
 	}
 
 	public Connection getConnection(String username, String password)
