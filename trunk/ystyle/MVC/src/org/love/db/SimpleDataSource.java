@@ -17,14 +17,18 @@ import org.love.dbutil.DbUtils;
 
 public class SimpleDataSource implements DataSource {
 
+	public final static int DEFAULT_MINIDLE=5;
+	public final static int DEFAULT_INITSIZE=20;
+	public final static int DEFAULT_MAXACTIVE=10;
+	
 	// 最小可用连接数
-	private int minIdle = 5;
+	private int minIdle;
 
 	// 初始化连接数
-	private int initSize = 20;
+	private int initSize;
 
 	// 同时连接最大并发数量
-	private int maxActive = 10;
+	private int maxActive;
 
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	private String username = "root";
@@ -48,10 +52,24 @@ public class SimpleDataSource implements DataSource {
 	// 应用中的连接并发数量
 	private int activeCount = 0;
 
-	public SimpleDataSource() {
+	public SimpleDataSource(){
+		
+	}
+	
+	public SimpleDataSource(String driverClassName,String username,String password,String url,int maxActive,int initSize,int minIdle) {
 		System.out.println("Hello I am SimpleDataSource !");
+		this.driverClassName=driverClassName;
+		this.username=username;
+		this.password=password;
+		this.url=url;
+		this.maxActive=maxActive;
+		this.initSize=initSize;
+		this.minIdle=minIdle;
 		init();
 	}
+	
+	
+	
 
 	public void init() {
 		DbUtils.loadDriver(driverClassName);
@@ -159,7 +177,30 @@ public class SimpleDataSource implements DataSource {
 
 	}
 
+	public int getMinIdle() {
+		return minIdle;
+	}
 
+	public void setMinIdle(int minIdle) {
+		this.minIdle = minIdle;
+	}
+
+	public int getInitSize() {
+		return initSize;
+	}
+
+	public void setInitSize(int initSize) {
+		this.initSize = initSize;
+	}
+
+	public int getMaxActive() {
+		return maxActive;
+	}
+
+	public void setMaxActive(int maxActive) {
+		this.maxActive = maxActive;
+	}
+	
 	public Connection getConnection(String username, String password)
 			throws SQLException {
 		// TODO Auto-generated method stub
