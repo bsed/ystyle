@@ -37,8 +37,13 @@ public class DefaultSession implements Session {
 	}
 
 	public void close() {
-		ConnectionPool.instance().closeConnection(connection);
-		connection = null;
+		try {
+			connection.close();
+			connection = null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public int update(String sql, Object... params) {

@@ -94,7 +94,7 @@ public class ConnectionPool {
 //				DruidDataSource dds=new DruidDataSource();
 //				dds.getConnection();
 				//dataSource.getConnection();
-				System.out.println("数据库加载完毕!");
+				System.out.println("druid加载完毕!");
 
 			}
 			
