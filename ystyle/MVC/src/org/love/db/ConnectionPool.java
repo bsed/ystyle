@@ -1,4 +1,4 @@
-package org.love.db;
+﻿package org.love.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -32,77 +32,89 @@ public class ConnectionPool {
 		try {
 			prop.load(Thread.currentThread().getContextClassLoader()
 					.getResourceAsStream(DB_PROPERTIES));
-			/*加载全局*/
-			
-			
-			/*加载simple*/
+			/* 加载全局 */
+
+			/* 加载simple */
 			String simpleClassName = prop.getProperty("simple.driverClassName");
-			if(simpleClassName!=null){
+			if (simpleClassName != null) {
 				String username = prop.getProperty("simple.username");
 				String password = prop.getProperty("simple.password");
-				String url=prop.getProperty("simple.url");
-				String simple_minsize=prop.getProperty("simple.minsize");	
-				SimpleDataSource simple_dataSource=new SimpleDataSource();
+				String url = prop.getProperty("simple.url");
+				String maxActive = prop.getProperty("simple.maxActive");
+				String initSize = prop.getProperty("simple.initSize");
+				String minIdle = prop.getProperty("simple.minIdle");
+				SimpleDataSource simple_dataSource = new SimpleDataSource();
 				simple_dataSource.setDriverClassName(simpleClassName);
 				simple_dataSource.setUsername(username);
 				simple_dataSource.setPassword(password);
 				simple_dataSource.setUrl(url);
-				//simple_dataSource.setMinsize(Integer.parseInt(simple_minsize));
-				dataSource=simple_dataSource;	
+				simple_dataSource.setMaxActive((maxActive == null || maxActive
+						.equals("")) ? SimpleDataSource.DEFAULT_MAXACTIVE
+						: Integer.parseInt(maxActive));
+				simple_dataSource.setInitSize((initSize == null || initSize
+						.equals("")) ? SimpleDataSource.DEFAULT_INITSIZE
+								: Integer.parseInt(maxActive));
+				simple_dataSource.setMinIdle((minIdle == null || minIdle
+						.equals("")) ? SimpleDataSource.DEFAULT_MINIDLE
+						: Integer.parseInt(maxActive));
+				simple_dataSource.init();
+				dataSource = simple_dataSource;
 			}
-			
-			String selfDataSource=prop.getProperty("self.dataSource");
-			if(selfDataSource!=null){
-				Map<String,String> fieldMap=ifDataSource("self");
-				Object selfds=InvocakeHelp.newInstance(selfDataSource,null);
-				for(Entry<String,String> ent:fieldMap.entrySet()){
-					callSetMethod(selfds,ent.getKey(),ent.getValue());
+
+			String selfDataSource = prop.getProperty("self.dataSource");
+			if (selfDataSource != null) {
+				Map<String, String> fieldMap = ifDataSource("self");
+				Object selfds = InvocakeHelp.newInstance(selfDataSource, null);
+				for (Entry<String, String> ent : fieldMap.entrySet()) {
+					callSetMethod(selfds, ent.getKey(), ent.getValue());
 				}
-				dataSource=DataSource.class.cast(selfds);
+				dataSource = DataSource.class.cast(selfds);
 			}
-			
-			
-			String c3p0DriverClass=prop.getProperty("c3p0.driverClass");
-			if(c3p0DriverClass!=null){
-				Map<String,String> fieldMap=ifDataSource("c3p0");
-				Object cpds=InvocakeHelp.newInstance("com.mchange.v2.c3p0.ComboPooledDataSource",null);
-				for(Entry<String,String> ent:fieldMap.entrySet()){
-					callSetMethod(cpds,ent.getKey(),ent.getValue());
+
+			String c3p0DriverClass = prop.getProperty("c3p0.driverClass");
+			if (c3p0DriverClass != null) {
+				Map<String, String> fieldMap = ifDataSource("c3p0");
+				Object cpds = InvocakeHelp.newInstance(
+						"com.mchange.v2.c3p0.ComboPooledDataSource", null);
+				for (Entry<String, String> ent : fieldMap.entrySet()) {
+					callSetMethod(cpds, ent.getKey(), ent.getValue());
 				}
-				
-				dataSource=DataSource.class.cast(cpds);
+
+				dataSource = DataSource.class.cast(cpds);
 			}
-			String proxoolxml=prop.getProperty("proxool.driver");
-			if(proxoolxml!=null){
-				Map<String,String> fieldMap=ifDataSource("proxool");
-				Object proxoolds=InvocakeHelp.newInstance("org.logicalcobwebs.proxool.ProxoolDataSource",null);
-				for(Entry<String,String> ent:fieldMap.entrySet()){
-					callSetMethod(proxoolds,ent.getKey(),ent.getValue());
+			String proxoolxml = prop.getProperty("proxool.driver");
+			if (proxoolxml != null) {
+				Map<String, String> fieldMap = ifDataSource("proxool");
+				Object proxoolds = InvocakeHelp.newInstance(
+						"org.logicalcobwebs.proxool.ProxoolDataSource", null);
+				for (Entry<String, String> ent : fieldMap.entrySet()) {
+					callSetMethod(proxoolds, ent.getKey(), ent.getValue());
 				}
-				
-				dataSource=DataSource.class.cast(proxoolds);
+
+				dataSource = DataSource.class.cast(proxoolds);
 			}
-			
-			String druidurl=prop.getProperty("druid.url");
-			if(druidurl!=null){
-				Map<String,String> fieldMap=ifDataSource("druid");
-				Object druidds=InvocakeHelp.newInstance("com.alibaba.druid.pool.DruidDataSource",null);
-				for(Entry<String,String> ent:fieldMap.entrySet()){
-					callSetMethod(druidds,ent.getKey(),ent.getValue());
+
+			String druidurl = prop.getProperty("druid.url");
+			if (druidurl != null) {
+				Map<String, String> fieldMap = ifDataSource("druid");
+				Object druidds = InvocakeHelp.newInstance(
+						"com.alibaba.druid.pool.DruidDataSource", null);
+				for (Entry<String, String> ent : fieldMap.entrySet()) {
+					callSetMethod(druidds, ent.getKey(), ent.getValue());
 				}
-				dataSource=DataSource.class.cast(druidds);
-//				DruidDataSource dds=new DruidDataSource();
-//				dds.getConnection();
-				//dataSource.getConnection();
+				dataSource = DataSource.class.cast(druidds);
+				// DruidDataSource dds=new DruidDataSource();
+				// dds.getConnection();
+				// dataSource.getConnection();
 				System.out.println("druid加载完毕!");
 
 			}
-			
-			//dds.setUrl(jdbcUrl)
-			
+
+			// dds.setUrl(jdbcUrl)
+
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException("数据库加载失败"+e);
+			throw new RuntimeException("数据库加载失败" + e);
 		}
 	}
 
