@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
@@ -23,7 +24,7 @@ public class SimpleDataSource implements DataSource {
 	private int initSize = 20;
 
 	// 同时连接最大并发数量
-	private int maxActive = 8;
+	private int maxActive = 10;
 
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	private String username = "root";
@@ -33,7 +34,10 @@ public class SimpleDataSource implements DataSource {
 	// 连接代理工厂
 	private ConnProxyFactory cpf = new ConnProxyFactory(this);
 
-	protected final ReentrantLock lock = new ReentrantLock(true);
+	private final ReentrantLock lock = new ReentrantLock(true);
+	
+	private Condition corcurrentCon=lock.newCondition();
+	
 
 	// 连接池
 	private List<Connection> connPool = new ArrayList<Connection>();
@@ -65,14 +69,12 @@ public class SimpleDataSource implements DataSource {
 	// 释放连接
 	public void closeConnection(Connection conn) throws SQLException {
 		// 假如释放的是一个关闭的连接，则在连接池中删除这个连接
-		//System.out.println(Thread.currentThread().getName()+"等待释放");
 		lock.lock();
 		try {
 			putPool(conn);
 			activeCount--;
-			//System.out.println(Thread.currentThread().getName()+"正在释放");
-			/*System.out.println("关闭连接,剩余空闲数: " + connPool.size() + "并发数: "
-					+ activeCount);*/
+			//释放连接后唤醒等待
+			corcurrentCon.signalAll();
 		} finally {
 			lock.unlock();
 		}
@@ -116,7 +118,7 @@ public class SimpleDataSource implements DataSource {
 				throw new RuntimeException(" cannot connect the database!");
 			}
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(2000);
 				conn = createConnection();
 				if (conn != null) {
 					errcount.set(0);
@@ -136,15 +138,19 @@ public class SimpleDataSource implements DataSource {
 		Connection conn = null;
 		lock.lock();
 		try {
+			if(activeCount>=maxActive){
+				//超过并发量 等待
+				corcurrentCon.await();
+			}
 			if (connPool.size() <= minIdle) {
-				//System.out.println("生成连接==========================");
+				//生成新连接
 				conn = createConnection();
 			} else {
 				conn = searchConntion();
 			}
 			activeCount++;
-			//System.out.println("剩余空闲数: " + connPool.size() + "并发数: "
-				//	+ activeCount);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			lock.unlock();
 		}
