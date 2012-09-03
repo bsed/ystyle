@@ -16,7 +16,8 @@ public class ConnProxyFactory extends DefaultProxyFactory {
 			throws Throwable {
 		Object returnValue = null;
 		if (method.getName().equals("close")) {
-			dataSource.closeConnection((Connection) this.getTargetObject());
+			dataSource.closeConnection((Connection)proxy);
+			System.out.println(proxy.getClass()+" 放入连接池");
 		} else {
 			returnValue = method.invoke(this.getTargetObject(), args);
 		}

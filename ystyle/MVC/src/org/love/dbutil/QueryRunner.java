@@ -315,7 +315,7 @@ public class QueryRunner {
      */
     protected PreparedStatement prepareStatement(Connection conn, String sql)
         throws SQLException {
-            
+            System.out.println("--------------- conn "+conn.isClosed());
         return conn.prepareStatement(sql);
     }
     
@@ -398,6 +398,7 @@ public class QueryRunner {
             result = rsh.handle(rs);
 
         } catch (SQLException e) {
+        	e.printStackTrace();
             this.rethrow(e, sql, params);
 
         } finally {
