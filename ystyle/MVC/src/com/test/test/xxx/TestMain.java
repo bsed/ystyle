@@ -57,10 +57,13 @@ public class TestMain {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		long endtime=System.currentTimeMillis();
-		System.out.println("准备结束"+(endtime-starttime));
+		
 		// 关闭线程池
 		pool.shutdown();
+		long endtime=System.currentTimeMillis();
+		System.out.println("准备结束"+(endtime-starttime));
+		
+		
 
 		
 		
