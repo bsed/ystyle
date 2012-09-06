@@ -72,7 +72,7 @@ public class MulRequestWraper extends HttpServletRequestWrapper {
 
 	public String getParameter(String name) {
 		Object[] values= paramMap.get(name);
-		if(values.length>0){
+		if(values!=null && values.length>0){
 			return (String)values[0];
 		}
 		return super.getParameter(name);
