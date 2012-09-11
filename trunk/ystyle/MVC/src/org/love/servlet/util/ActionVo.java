@@ -14,7 +14,8 @@ public class ActionVo {
 	private String method;
 	private String className;
 	private Map<String,Result> results;
-    
+
+
 	public String getName() {
 		return name;
 	}
