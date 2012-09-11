@@ -22,7 +22,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.love.Container.BeanContainer;
 import org.love.action.ContextAction;
 import org.love.converter.TypeConverter;
-import org.love.db.ConnectionPool;
 import org.love.servlet.util.ActionVo;
 import org.love.servlet.util.ControlXML;
 import org.love.servlet.util.Result;
@@ -63,15 +62,18 @@ public class MainServlet extends HttpServlet {
 		logger.debug("namespace:"+namespace);
 		logger.debug("actionname:"+actionname);
 	
+		//注入Action Context
+		Map<String, Object> contextMap=new HashMap<String, Object>();
+		contextMap.put(ActionContext.HTTPREQUEST,request);
+		contextMap.put(ActionContext.HTTPRESPONSE,response);
+		ActionContext.setContext(new ActionContext(contextMap));
+		
 		
 		ControlXML controlXml = ControlXML.getInstance();
 		ActionVo avo = controlXml.getAction(namespace, actionname);
 		
 		if(avo==null){
-			//释放上下文资源
-			ActionContext.setContext(null);
-			
-		   //没找到配置的action，那么直接转发到jsp
+			//没找到配置的action，那么直接转发到jsp
 			request.getRequestDispatcher("/WEB-INF"+namespace+"/"+actionname+".jsp").forward(request, response);
 			return ;
 		}
@@ -94,15 +96,14 @@ public class MainServlet extends HttpServlet {
 		//假如是带有上传，那么利用common fileupload封装表单
 		if(contentType!=null && contentType.startsWith("multipart/form-data")){
 			request=new MulRequestWraper(request);
+			//重新注入新的request
+			ActionContext.getContext().put(ActionContext.HTTPREQUEST,request);
 		}
 		
+
 		paramMap=request.getParameterMap();
 		
-		//注入Action Context
-		Map<String, Object> contextMap=new HashMap<String, Object>();
-		contextMap.put(ActionContext.HTTPREQUEST,request);
-		contextMap.put(ActionContext.HTTPRESPONSE,response);
-		ActionContext.setContext(new ActionContext(contextMap));
+	
 		
 		// 为action注入所需要的元素 比如context request reponse等
 		setActionContext(action, request, response);
