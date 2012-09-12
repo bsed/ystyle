@@ -58,6 +58,18 @@ public class DefaultSession implements Session {
 		return count;
 	}
 
+	@Override
+	public int[] updateBatch(String sql, Object[][] params) {
+		QueryRunner qr = new QueryRunner();
+		int[] count={0};
+		try {
+			count=qr.batch(connection, sql, params);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return count;
+	}
+
 	
 	public <T> List<T> query(String sql, Class cls, Object... params) {
 		QueryRunner qr = new QueryRunner();
@@ -81,13 +93,6 @@ public class DefaultSession implements Session {
 		}
 		return null;
 	}
-
-	
-
-	
-
-
-
 
 	
 
