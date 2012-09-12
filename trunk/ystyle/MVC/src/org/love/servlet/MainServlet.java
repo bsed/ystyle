@@ -43,18 +43,7 @@ public class MainServlet extends HttpServlet {
 	public void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-//		int xxx=0;
-//		try{
-//			if(xxx==0){
-//				response.sendRedirect(request.getContextPath()+"/error.jsp");
-//				return;
-//			}	
-//		}finally{
-//			System.out.println("关闭");
-//		}
-		
-		
-		
+
 		try {
 			// 字符编码
 			request.setCharacterEncoding(encoding);
@@ -127,7 +116,6 @@ public class MainServlet extends HttpServlet {
 					if(result==null){
 						result = avo.getResults().get("success");
 					}
-					System.out.println("result.getName(): "+result.getName()+": "+result.getUrltext());
 					if (result != null) {
 						if ("redirect".equals(result.getType())) {
 							response.sendRedirect(request.getContextPath()
