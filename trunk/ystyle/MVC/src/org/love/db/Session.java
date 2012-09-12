@@ -14,6 +14,8 @@ public interface Session {
 
 	public int update(String sql, Object... params);
 	
+	public int[] updateBatch(String sql, Object[][] params);
+	
 
 	public <T> List<T> query(String sql, Class cls, Object... params);
 	
