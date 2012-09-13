@@ -64,7 +64,7 @@ Set<Table> tables=CreateService.getAllTables();
   
   </table>
   
-    <form action="<%=path%>/pojo/createPojos.love" method="post"> 
+    <form action="<%=path%>/pojo/createPojos.action" method="post"> 
      <table>
      <tr>
      <td>表名</td><td><input type="text" name="tablename" id="tablename" readonly/></td><td></td>
