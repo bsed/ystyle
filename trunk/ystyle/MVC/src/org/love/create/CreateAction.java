@@ -16,7 +16,11 @@ public class CreateAction extends BaseAction {
 		Session session=SessionFactory.getSession();
 		Connection conn=session.getConnection();
 		try {
-		    CreateService.generateCode(packageName, null,tablename, srcdir, superClass,conn);
+			String[] tablenameArr=tablename.split(",");
+			for(String tn:tablenameArr){
+				CreateService.generateCode(packageName, null,tn, srcdir, superClass,conn);	
+			}
+		    
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
