@@ -37,7 +37,7 @@ public class SimpleDataSource implements DataSource {
 
 	// 连接代理工厂
 	private ConnProxyFactory cpf = new ConnProxyFactory(this);
-
+	
 	private final ReentrantLock lock = new ReentrantLock(true);
 	
 	private Condition corcurrentCon=lock.newCondition();
