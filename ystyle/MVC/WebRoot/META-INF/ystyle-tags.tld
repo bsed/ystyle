@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" "http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd">
+
+<taglib>
+	<tlibversion>2.3</tlibversion>
+	<jspversion>1.1</jspversion>
+	<shortname>ystyle-tags</shortname>
+	<uri>/ystyle-tags</uri>
+	<info>分页标签</info>
+	<tag>
+		<name>token</name>
+		<tagclass>org.love.tag.TokenTag</tagclass>
+		<bodycontent>empty</bodycontent>
+	</tag>
+	
+</taglib>
