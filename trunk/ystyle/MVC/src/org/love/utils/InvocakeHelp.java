@@ -77,6 +77,10 @@ public class InvocakeHelp {
 	}
 	
 	
+	public static void checkSingle(){
+		
+	}
+	
 	
 	
 
