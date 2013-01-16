@@ -8,6 +8,7 @@
 	<filter>
 		<filter-name>mainFilter</filter-name>
 		<filter-class>org.love.servlet.MainFilter</filter-class>
+		
 		<init-param>
 			<description>
 				control action的配置文件路径 不配置，则默认为src根路径的control.xml文件
@@ -21,7 +22,7 @@
 				配置需要纳入容器管理的bean
 			</description>
 			<param-name>BEAN_PACKAGE</param-name>
-			<param-value>org.test</param-value>
+			<param-value>com.test</param-value>
 		</init-param>
 
 		<init-param>
@@ -33,6 +34,8 @@
 	<filter-mapping>
 		<filter-name>mainFilter</filter-name>
 		<url-pattern>*.action</url-pattern>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
 
