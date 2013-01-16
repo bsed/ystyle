@@ -30,7 +30,7 @@ public class ServiceProxyFactory extends DefaultProxyFactory {
 		Transactional tran = targetMethod.getAnnotation(Transactional.class);
 		if (tran != null) {
 			/* 说明此方法已使用了Transactional的注解，则需要在方法完成后提交事务 */
-			logger.debug("开启事务  :"+targetClass.getName()+"."+method.getName());
+			logger.debug("开启事务  :"+targetClass.getName()+"."+method);
 			Session session=SessionFactory.getSession();
 			TransactionManager transactionManager=session.beginTransaction();
 			try {
@@ -38,9 +38,11 @@ public class ServiceProxyFactory extends DefaultProxyFactory {
 				transactionManager.commit();
 				logger.debug("事务已提交");
 			} catch (Exception ex) {
-				ex.printStackTrace();
 				logger.debug("事务已回滚");
 				transactionManager.rollback();
+				Exception e0=new Exception();
+	        	e0.initCause(ex);
+	        	throw e0;
 			}
 			SessionFactory.closeSession(session);
 		}else{

@@ -2,6 +2,7 @@ package org.love.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ import org.love.servlet.util.Result;
 import org.love.utils.ActionContext;
 import org.love.utils.InvocakeHelp;
 import org.love.utils.Utils;
+import java.lang.reflect.Modifier;
 
 /**
  * UTF-8
@@ -184,7 +186,7 @@ public class MainFilter implements Filter {
 			 */
 			// AnnotationHelp.AutowiredSet(action);
 			BeanContainer.instince().AutowiredSet(action);
-			logger.debug(BeanContainer.instince().getMapInfo());
+
 			Object actionValue = InvocakeHelp.invokeMethod(action, avo
 					.getMethod(), null);
 
@@ -287,34 +289,82 @@ public class MainFilter implements Filter {
 
 	}
 
+	/**
+	 * 我们假定单例下面Autowire的也是单例类，比较合理，咱不用类似spring的方法注入。
+	 * 
+	 * @param allCompleteClass
+	 * @param cls
+	 * @param obj
+	 * @throws Exception
+	 */
+	private Object loadSingleClass(Class cls, Object obj) throws Exception {
+		if (BeanContainer.instince().containsKey(cls.getName())) {
+			// 假如在容器中已存在，那么不需要做任何处理，此obj对象可以直接使用（且一定是单例的）
+			return BeanContainer.instince().getBean(cls.getName());
+		}
+		SingleTon singleton = (SingleTon) cls.getAnnotation(SingleTon.class);
+		Field[] fields = cls.getDeclaredFields();
+		for (Field f : fields) {
+			Autowired autowired = f.getAnnotation(Autowired.class);
+			if (autowired != null) {
+				Class iocClass = autowired.iocClass();
+
+				if(singleton!=null){
+				    //单例的话，才把属性注入到此对象
+					// 构造set方法
+					String setName = "set"
+							+ f.getName().substring(0, 1).toUpperCase()
+							+ f.getName().substring(1);
+
+					// 得到action set的方法以及它的参数类型，注意此时不能是参数子类的类型。
+					Method setMethod = cls.getMethod(setName, new Class[] { f
+							.getType() });
+					
+					if (BeanContainer.instince().containsKey(iocClass.getName())) {
+                       setMethod.invoke(obj, BeanContainer.instince().getBean(
+								iocClass.getName()));
+
+					}else {
+						Object iocObject=iocClass.newInstance();
+						iocObject=loadSingleClass(iocClass,iocObject);
+						setMethod.invoke(obj,iocObject);
+					}
+					
+				}else{
+					loadSingleClass(iocClass,iocClass.newInstance());
+				}
+				
+
+			}
+		}
+		
+		obj = BeanContainer.instince().setProxyObject(obj);
+		
+		if (singleton != null) {
+			// 单例才保存
+			BeanContainer.instince().saveBean(cls.getName(), obj);
+		}
+		return obj;
+		
+	}
+
 	public void init(FilterConfig filterConfig) throws ServletException {
 		logger.info("初始化MainFilter");
 		String BEAN_PACKAGE = filterConfig.getInitParameter("BEAN_PACKAGE");
 		Set<Class<?>> sets = Utils.getClasses(BEAN_PACKAGE);
-		Map<String, Object> allClass = new HashMap<String, Object>();
-		Map<String, Object> allCompleteClass = new HashMap<String, Object>();
 		try {
 			for (Class cls : sets) {
-				 Object obj=cls.newInstance();
-				Field[] fields = cls.getDeclaredFields();
-				SingleTon singleton=(SingleTon) cls.getAnnotation(SingleTon.class);
-				for (Field f : fields) {
-					Autowired autowired = f.getAnnotation(Autowired.class);
-					
-					if (autowired != null) {
-						Class iocClass = autowired.iocClass();
-						// 构造set方法
-						String setName = "set"
-								+ f.getName().substring(0, 1).toUpperCase()
-								+ f.getName().substring(1);
-
-						// 得到action set的方法以及它的参数类型，注意此时不能是参数子类的类型。
-						Method setMethod = cls.getMethod(setName,
-								new Class[] { f.getType() });
-						if (allCompleteClass.containsKey(iocClass.getName())) {
-							setMethod.invoke(obj, allCompleteClass.get(iocClass.getName()));
-						}
+				if (!cls.isInterface()
+						&& cls.getModifiers() != Modifier.ABSTRACT) {
+					try {
+						Constructor constructor = cls.getConstructor(null);
+						Object obj = constructor.newInstance(null);
+						loadSingleClass(cls, obj);
+					} catch (NoSuchMethodException notSuch) {
+                              
 					}
+					
+
 				}
 
 			}
@@ -322,7 +372,7 @@ public class MainFilter implements Filter {
 			ex.printStackTrace();
 			logger.debug(ex);
 		}
-
+		//logger.debug(BeanContainer.instince().getMapInfo());
 		servletContext = filterConfig.getServletContext();
 		ConnectionPool.instance();
 		ControlXML controlXml = ControlXML.getInstance();

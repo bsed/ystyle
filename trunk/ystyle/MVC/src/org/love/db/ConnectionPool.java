@@ -7,14 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.sql.DataSource;
 
 import org.love.utils.InvocakeHelp;
-
-import com.alibaba.druid.pool.DruidDataSource;
 
 public class ConnectionPool {
 
