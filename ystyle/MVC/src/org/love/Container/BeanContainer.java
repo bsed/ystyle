@@ -45,6 +45,10 @@ public class BeanContainer {
 		return null;
 	}
 	
+	public boolean containsKey(String name) {
+		return autoObjMap.containsKey(name);
+	}
+	
 	public void saveBean(String name,Object obj){
 		 autoObjMap.put(name,obj);
 	}
@@ -69,20 +73,13 @@ public class BeanContainer {
 	 */
 	public void AutowiredSet(Object obj) {
 		Class cls = obj.getClass();
-		Object returnObj = null;
-		/*if(autoObjMap.containsKey(cls.getName())){
-			returnObj = getBean(cls.getName());
-			obj = returnObj;
-			return;
-		}*/
-		
-		// 得到action定义的属性
+	
+		// 得到自定义的属性
 		Field[] fields = cls.getDeclaredFields();
 		try {
 			for (Field f : fields) {
 				// 循环判断是否有Autowired的自动注入field
 				Autowired au = f.getAnnotation(Autowired.class);
-				//System.out.println("========================="+f.getName()+" : "+au+"======================\n");
 				if (au != null) {
 					// 假如此属性被注解为Autowired
 					// 得到需要注入的实例class
@@ -99,7 +96,6 @@ public class BeanContainer {
 					Object iocObj = null;
 
 					if (autoObjMap.containsKey(ioc.getName())) {
-						System.out.println("已在缓存中找到" + ioc.getName());
 						iocObj=getBean(ioc.getName());
 						setMethod.invoke(obj, iocObj);
 						/*if(iocObj instanceof java.lang.reflect.Proxy){
@@ -117,30 +113,10 @@ public class BeanContainer {
 						continue;
 					}
 					iocObj = ioc.newInstance();
-					System.out.println("处理" + ioc.getName());
+					//先把Field注入，再做代理
 					AutowiredSet(iocObj);
 					// 没有标记注解，则为普通注入
-					Object setObject = iocObj;
-					Service service = iocObj.getClass().getAnnotation(
-							Service.class);
-					Proxy proxy = iocObj.getClass().getAnnotation(Proxy.class);
-					if (service != null) {
-						// 利用Service层的代理构建出被注入实例的代理对象，执行set方法注入进去。
-						Object proxyFactoryClass = service.proxyFactoryClass()
-								.newInstance();
-						setObject = setProxyObject(proxyFactoryClass, iocObj,null);
-					} 
-					if (proxy != null) {
-						// 对非service的类进行代理扩展
-						Object proxyFactoryClass = proxy.proxyFactoryClass()
-								.newInstance();
-						String params=proxy.params();
-						setObject = setProxyObject(proxyFactoryClass, setObject,params);
-					} 
-					if (checkSingle(iocObj)) {
-						autoObjMap.put(iocObj.getClass().getName(),
-								setObject);
-					}
+					Object setObject = setProxyObject(iocObj);
 					setMethod.invoke(obj, setObject);
 				}
 
@@ -149,7 +125,27 @@ public class BeanContainer {
 			ex.printStackTrace();
 		}
 	}
-
+    public Object setProxyObject(Object srcObj) throws Exception{
+    	Object setObject=srcObj;
+    	Service service = srcObj.getClass().getAnnotation(
+				Service.class);
+    	Proxy proxy = srcObj.getClass().getAnnotation(Proxy.class);
+		if (service != null) {
+			// 利用Service层的代理构建出被注入实例的代理对象，执行set方法注入进去。
+			Object proxyFactoryClass = service.proxyFactoryClass()
+					.newInstance();
+			setObject = setProxyObject(proxyFactoryClass, srcObj,null);
+		} 
+		if (proxy != null) {
+			// 对非service的类进行代理扩展
+			Object proxyFactoryClass = proxy.proxyFactoryClass()
+					.newInstance();
+			String params=proxy.params();
+			setObject = setProxyObject(proxyFactoryClass, setObject,params);
+			
+		} 
+		return setObject;
+    }
 	public Object setProxyObject(Object proxyFactoryClass, Object obj,Object params) {
 		checkProxy(proxyFactoryClass);
 		ProxyFactory pf = (ProxyFactory) proxyFactoryClass;

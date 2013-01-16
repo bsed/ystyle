@@ -3,12 +3,14 @@ package com.test.dao;
 import java.util.List;
 
 import org.love.Annotation.Proxy;
+import org.love.Annotation.SingleTon;
 import org.love.db.Session;
 import org.love.db.SessionFactory;
 
 import com.test.test.TestProxy;
 import com.test.vo.Userinfo;
 
+@SingleTon
 @Proxy(proxyFactoryClass=TestProxy.class)
 public class UserDAOImpl implements UserDAO {
 
