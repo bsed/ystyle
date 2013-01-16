@@ -22,13 +22,13 @@
 	<body>
 		<form action="<%=path%>/test/test1.action" method="post" enctype="multipart/form-data">
 		    <y:token/>
-			姓名:<input type="text" name="testAfei.username" />
+			姓名:<input type="text" name="testAfei.username" value="xxx"/>
 			<br/>
-			密码:<input type="text" name="testAfei.password" />
+			密码:<input type="text" name="testAfei.password" value="yyy" />
 			<br/>
-			年龄1:<input type="text" name="testAfei.age" />
+			年龄1:<input type="text" name="testAfei.age" value="111" />
 			<br/>
-			年龄2:<input type="text" name="testAfei.ageTest" />
+			年龄2:<input type="text" name="testAfei.ageTest" value="222" />
 			<br/>
 			年龄3:<input type="text" name="testAfei.ageTest" />
 			<br/>
