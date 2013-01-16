@@ -23,6 +23,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   </head>
   
   <body>
-    我是成功页面${paramSuccess}
+    我是成功页面${paramSuccess}  <a href="<%=path%>/">返回</a>
   </body>
 </html>
