@@ -374,7 +374,7 @@ public class MainFilter implements Filter {
 		}
 		//logger.debug(BeanContainer.instince().getMapInfo());
 		servletContext = filterConfig.getServletContext();
-		ConnectionPool.instance();
+		//ConnectionPool.instance();
 		ControlXML controlXml = ControlXML.getInstance();
 		String control_config = filterConfig.getInitParameter("CONTROL_CONFIG");
 
