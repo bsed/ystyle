@@ -1,4 +1,4 @@
-﻿package org.love.db;
+package org.love.db;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -108,6 +108,7 @@ public class ConnectionPool {
 
 			// dds.setUrl(jdbcUrl)
 
+			System.out.println("数据库加载完毕!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("数据库加载失败" + e);
