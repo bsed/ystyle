@@ -3,9 +3,11 @@ package org.love.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.love.dbutil.QueryRunner;
 import org.love.dbutil.handlers.BeanListHandler;
+import org.love.dbutil.handlers.MapListHandler;
 import org.love.dbutil.handlers.ScalarHandler;
 
 public class DefaultSession implements Session {
@@ -82,12 +84,25 @@ public class DefaultSession implements Session {
 		}
 		return null;
 	}
+	
 
 	public Long queryCount(String sql, Object... params) {
 		QueryRunner qr = new QueryRunner();
 		try {
 			Object obj=qr.query(connection,sql,new ScalarHandler(),params);
 			return (Long)obj;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public List<Map<String, Object>> query(String sql, Object... params) {
+		QueryRunner qr = new QueryRunner();
+		try {
+			List<Map<String,Object>> list=qr.query(connection,sql,new MapListHandler(),params);
+			return list;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

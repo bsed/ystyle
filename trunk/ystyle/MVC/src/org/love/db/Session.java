@@ -2,6 +2,7 @@ package org.love.db;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 
 public interface Session {
 	public TransactionManager beginTransaction();
@@ -18,6 +19,8 @@ public interface Session {
 	
 
 	public <T> List<T> query(String sql, Class cls, Object... params);
+	
+	public List<Map<String,Object>> query(String sql,Object...params);
 	
 	public Long queryCount(String sql,Object... params);
 }
