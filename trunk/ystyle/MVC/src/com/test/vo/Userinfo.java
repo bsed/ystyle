@@ -7,7 +7,7 @@ import org.love.po.FilePo;
 public class Userinfo implements java.io.Serializable {
 
 
-    // @Id
+    // @Id 
     private Integer toid;
     private String username;
     private Integer age;
