@@ -37,6 +37,7 @@ import org.love.utils.ActionContext;
 import org.love.utils.InvocakeHelp;
 import org.love.utils.Utils;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 
 /**
  * UTF-8
@@ -309,8 +310,8 @@ public class MainFilter implements Filter {
 			if (autowired != null) {
 				Class iocClass = autowired.iocClass();
 
-				if(singleton!=null){
-				    //单例的话，才把属性注入到此对象
+				if (singleton != null) {
+					// 单例的话，才把属性注入到此对象
 					// 构造set方法
 					String setName = "set"
 							+ f.getName().substring(0, 1).toUpperCase()
@@ -319,33 +320,33 @@ public class MainFilter implements Filter {
 					// 得到action set的方法以及它的参数类型，注意此时不能是参数子类的类型。
 					Method setMethod = cls.getMethod(setName, new Class[] { f
 							.getType() });
-					
-					if (BeanContainer.instince().containsKey(iocClass.getName())) {
-                       setMethod.invoke(obj, BeanContainer.instince().getBean(
+
+					if (BeanContainer.instince()
+							.containsKey(iocClass.getName())) {
+						setMethod.invoke(obj, BeanContainer.instince().getBean(
 								iocClass.getName()));
 
-					}else {
-						Object iocObject=iocClass.newInstance();
-						iocObject=loadSingleClass(iocClass,iocObject);
-						setMethod.invoke(obj,iocObject);
+					} else {
+						Object iocObject = iocClass.newInstance();
+						iocObject = loadSingleClass(iocClass, iocObject);
+						setMethod.invoke(obj, iocObject);
 					}
-					
-				}else{
-					loadSingleClass(iocClass,iocClass.newInstance());
+
+				} else {
+					loadSingleClass(iocClass, iocClass.newInstance());
 				}
-				
 
 			}
 		}
-		
+
 		obj = BeanContainer.instince().setProxyObject(obj);
-		
+
 		if (singleton != null) {
 			// 单例才保存
 			BeanContainer.instince().saveBean(cls.getName(), obj);
 		}
 		return obj;
-		
+
 	}
 
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -361,9 +362,8 @@ public class MainFilter implements Filter {
 						Object obj = constructor.newInstance(null);
 						loadSingleClass(cls, obj);
 					} catch (NoSuchMethodException notSuch) {
-                              
+
 					}
-					
 
 				}
 
@@ -372,9 +372,9 @@ public class MainFilter implements Filter {
 			ex.printStackTrace();
 			logger.debug(ex);
 		}
-		//logger.debug(BeanContainer.instince().getMapInfo());
+		// logger.debug(BeanContainer.instince().getMapInfo());
 		servletContext = filterConfig.getServletContext();
-		//ConnectionPool.instance();
+		// ConnectionPool.instance();
 		ControlXML controlXml = ControlXML.getInstance();
 		String control_config = filterConfig.getInitParameter("CONTROL_CONFIG");
 
@@ -401,9 +401,12 @@ public class MainFilter implements Filter {
 		this.encoding = encoding_p;
 
 		// 加载log4j
-		PropertyConfigurator.configure(Thread.currentThread()
-				.getContextClassLoader().getResource("log4j.properties")
-				.getFile());
+		URL log4jUrl = Thread.currentThread().getContextClassLoader()
+				.getResource("log4j.properties");
+		if (log4jUrl != null) {
+			PropertyConfigurator.configure(log4jUrl.getFile());
+		}
+
 	}
 
 }
