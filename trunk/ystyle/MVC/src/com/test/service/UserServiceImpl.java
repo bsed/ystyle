@@ -1,12 +1,13 @@
 package com.test.service;
 
+import java.util.List;
+
 import org.love.Annotation.Autowired;
 import org.love.Annotation.Proxy;
 import org.love.Annotation.Service;
 import org.love.Annotation.SingleTon;
 import org.love.Annotation.Transactional;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 import com.test.dao.UserDAO;
 import com.test.dao.UserDAOImpl;
 import com.test.test.DaoLogProxy;

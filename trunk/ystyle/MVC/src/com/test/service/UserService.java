@@ -1,7 +1,8 @@
 package com.test.service;
 
+import java.util.List;
+
 import com.test.vo.Userinfo;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 
 public interface UserService {
